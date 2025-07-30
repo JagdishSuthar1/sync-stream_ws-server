@@ -7,7 +7,7 @@ import http from "http"
 const app = express();
 const httpServer = http.createServer(app)
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3000
 httpServer.listen(PORT , ()=>console.log("Server is running on port : ", PORT))
 const ws = new WebSocket.Server({ server: httpServer });
 
