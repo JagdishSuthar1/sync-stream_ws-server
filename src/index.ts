@@ -3,12 +3,13 @@ import WebSocket, { WebSocketServer } from "ws";
 import { IncommingData } from "./types";
 import { Users } from "./users";
 import { SpacePolls } from "./polls";
-
+import http from "http"
 const app = express();
+const httpServer = http.createServer(app)
 
-const httpServer = app.listen(3001)
-
-const ws = new WebSocketServer({ server: httpServer });
+const PORT = process.env.PORT || 3001
+httpServer.listen(PORT , ()=>console.log("Server is running on port : ", PORT))
+const ws = new WebSocket.Server({ server: httpServer });
 
 const SpacesUsers = new Users();
 const PollsOfSPaces = new SpacePolls();
@@ -46,7 +47,7 @@ ws.on("connection", (socket: WebSocket) => {
             const response = SpacesUsers.addUserToSpace(data.payload.spaceId, data.payload.userId, socket, data.payload.email);
             // //console.log(response)
             if (response.success == true) {
-                const payloadSendToAllSocket = JSON.stringify({ type: "ADDED_USER", payload: `UserId ${data.payload.email} is Connected"` })
+                const payloadSendToAllSocket = JSON.stringify({ type: "ADDED_USER", payload: `UserId ${data.payload.email} is Connected` })
                 SendMessageToAll(data.payload.spaceId, payloadSendToAllSocket);
 
             }
@@ -55,7 +56,7 @@ ws.on("connection", (socket: WebSocket) => {
             const response = SpacesUsers.removeUsers(data.payload.spaceId, data.payload.userId);
             // //console.log(response)
             if (response.success == true) {
-                const payloadSendToAllSocket = JSON.stringify({ type: "REMOVED_USER", payload: `User ${data.payload.email} is Removed"` });
+                const payloadSendToAllSocket = JSON.stringify({ type: "REMOVED_USER", payload: `User ${data.payload.email} is Removed` });
                 SendMessageToAll(data.payload.spaceId, payloadSendToAllSocket);
                 response.data.close(1000, "Kicked");
             }
